@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVID II — Quarter Reflection</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; background: #12121f; color: #d0d0e0;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    padding: 40px 20px 60px; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 700px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 8px; }
+  .header .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6a8a; margin-bottom: 4px; }
+  .header h1 { font-family: 'Instrument Serif', Georgia, serif; font-size: 36px; font-weight: 400; color: #e8d5b7; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .header .sub { color: #6a6a8a; font-size: 14px; }
+
+  .progress { display: flex; align-items: center; max-width: 560px; margin: 24px auto 32px; }
+  .progress .dot {
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; border: 2px solid #3a3a5a; color: #5a5a7a; transition: all 0.4s ease; flex-shrink: 0;
+  }
+  .progress .dot.done { background: #1a1a2e; border-color: #e8d5b7; color: #e8d5b7; }
+  .progress .dot.active { background: #e8d5b7; border-color: #e8d5b7; color: #1a1a2e; font-weight: 700; font-size: 15px; }
+  .progress .line { flex: 1; height: 2px; margin: 0 4px; background: #3a3a5a; transition: background 0.4s ease; }
+  .progress .line.done { background: #e8d5b7; }
+
+  .phase {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(232,213,183,0.12);
+    border-radius: 16px; padding: 36px 32px; max-width: 640px; margin: 0 auto;
+    animation: fadeSlide 0.45s ease;
+  }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .phase h2 { font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; font-weight: 400; color: #e8d5b7; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .phase .phase-sub { color: #8a8aaa; font-size: 14px; line-height: 1.5; margin-bottom: 28px; }
+
+  .callout {
+    background: rgba(232,213,183,0.06); border-radius: 10px; padding: 18px 20px;
+    border-left: 3px solid #e8d5b7; margin-bottom: 24px;
+  }
+  .callout p { font-size: 14px; color: #c0c0d0; line-height: 1.7; }
+  .callout strong { color: #e8d5b7; }
+
+  label.field-label {
+    font-size: 12px; color: #8a8aaa; display: block; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  input.text-input, textarea.text-input {
+    width: 100%; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+    color: #e0e0f0; font-size: 15px; font-family: inherit; transition: border-color 0.2s;
+  }
+  input.text-input:focus, textarea.text-input:focus { outline: none; border-color: rgba(232,213,183,0.4); }
+  textarea.text-input { min-height: 180px; resize: vertical; line-height: 1.7; font-family: 'Instrument Serif', Georgia, serif; }
+  textarea.text-input.short { min-height: 90px; font-family: 'DM Sans', sans-serif; font-size: 14px; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .rating-row {
+    margin-bottom: 20px; padding: 16px 18px; background: rgba(255,255,255,0.02);
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .rating-row .r-label { font-weight: 600; font-size: 15px; color: #e0e0f0; margin-bottom: 2px; }
+  .rating-row .r-desc { font-size: 13px; color: #7a7a9a; margin-bottom: 12px; }
+  .rating-btns { display: flex; gap: 8px; }
+  .rating-btns button {
+    flex: 1; padding: 8px 4px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 500; line-height: 1.3; font-family: inherit;
+    background: rgba(255,255,255,0.05); color: #8a8aaa; transition: all 0.2s ease;
+  }
+  .rating-btns button.selected { background: #e8d5b7; color: #1a1a2e; }
+
+  .time-row { margin-bottom: 14px; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 10px; }
+  .time-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .time-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #d0d0e0; }
+  .time-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .time-val { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 50px; text-align: right; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 6px;
+    border-radius: 3px; background: rgba(255,255,255,0.08); outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; border: none; background: var(--accent); cursor: pointer; }
+  .time-total {
+    margin-top: 16px; padding: 14px 18px; border-radius: 10px; text-align: center;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+  }
+  .time-total.warn { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.2); }
+  .time-total .t-label { font-size: 14px; color: #8a8aaa; }
+  .time-total .t-num { font-size: 18px; font-weight: 700; color: #e8d5b7; }
+  .time-total.warn .t-num { color: #f87171; }
+  .time-total .t-warn { font-size: 12px; color: #f87171; margin-top: 4px; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 18px 14px; text-align: center; }
+  .stat-val { font-size: 24px; font-weight: 700; font-family: 'Instrument Serif', Georgia, serif; }
+  .stat-label { font-size: 11px; color: #8a8aaa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .insight-box {
+    background: rgba(232,213,183,0.06); border: 1px solid rgba(232,213,183,0.15);
+    border-radius: 12px; padding: 20px 22px; margin-bottom: 24px;
+  }
+  .insight-box .i-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #e8d5b7; margin-bottom: 8px; font-weight: 600; }
+  .insight-box p { font-size: 15px; color: #d0d0e0; line-height: 1.7; }
+
+  .tag-section { margin-bottom: 16px; }
+  .tag-heading { font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tag-heading.red { color: #f87171; }
+  .tag-heading.green { color: #2dd4bf; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { padding: 5px 12px; border-radius: 20px; font-size: 13px; }
+  .tag.red { background: rgba(248,113,113,0.12); color: #f87171; }
+  .tag.green { background: rgba(45,212,191,0.12); color: #2dd4bf; }
+
+  .wb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  .wb-card { padding: 18px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
+  .wb-card .wb-icon { font-size: 22px; margin-bottom: 6px; }
+  .wb-card .wb-name { font-size: 14px; font-weight: 600; color: #e0e0f0; margin-bottom: 4px; }
+  .wb-card .wb-q { font-size: 12px; color: #7a7a9a; margin-bottom: 12px; line-height: 1.4; }
+  .wb-btns { display: flex; gap: 6px; }
+  .wb-btns button {
+    flex: 1; padding: 7px 2px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 10px; font-weight: 500; font-family: inherit;
+    background: rgba(255,255,255,0.05); color: #8a8aaa; transition: all 0.2s;
+  }
+  .wb-btns button.selected { color: #1a1a2e; }
+
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 28px 0; }
+
+  .reflect-prompt {
+    margin-bottom: 20px; padding: 18px 20px; border-radius: 12px;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+  }
+  .reflect-prompt .rp-q { font-size: 14px; color: #e0e0f0; font-weight: 500; margin-bottom: 10px; line-height: 1.5; }
+
+  .char-count { font-size: 12px; text-align: right; margin-top: 4px; }
+  .char-count.ok { color: #6a6a8a; }
+  .char-count.short { color: #f87171; }
+  .one-change { margin-top: 24px; }
+  .one-change label { font-size: 13px; color: #e8d5b7; font-weight: 600; display: block; margin-bottom: 10px; }
+
+  .summary-meta { font-size: 13px; color: #8a8aaa; margin-bottom: 20px; }
+  .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #e8d5b7; margin-bottom: 12px; font-weight: 600; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .summary-item { display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; font-size: 13px; }
+  .summary-item .s-label { color: #a0a0c0; }
+  .summary-item .s-val { font-weight: 600; }
+  .s-val.high { color: #2dd4bf; } .s-val.mid { color: #fbbf24; } .s-val.low { color: #f87171; }
+  .time-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .time-tag { padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+  .wb-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .change-box { padding: 18px 20px; background: rgba(232,213,183,0.06); border-radius: 12px; border-left: 3px solid #e8d5b7; margin-bottom: 24px; }
+  .change-box p { font-size: 15px; color: #e0e0f0; line-height: 1.6; font-style: italic; }
+  .letter-text { font-size: 14px; color: #b0b0c8; line-height: 1.7; font-family: 'Instrument Serif', Georgia, serif; white-space: pre-wrap; margin-bottom: 24px; }
+  .reflect-summary { margin-bottom: 24px; }
+  .reflect-summary .rs-item { margin-bottom: 16px; }
+  .reflect-summary .rs-q { font-size: 12px; color: #8a8aaa; margin-bottom: 4px; font-style: italic; }
+  .reflect-summary .rs-a { font-size: 14px; color: #c0c0d8; line-height: 1.6; }
+
+  .submit-box { text-align: center; margin-top: 32px; padding: 24px; background: rgba(45,212,191,0.06); border-radius: 12px; border: 1px solid rgba(45,212,191,0.15); }
+  .submit-box .s-main { font-size: 14px; color: #2dd4bf; font-weight: 500; margin-bottom: 12px; }
+  .btn-submit {
+    padding: 12px 36px; border-radius: 8px; border: none;
+    background: #2dd4bf; color: #1a1a2e; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-submit:hover { background: #5eead4; }
+  .btn-submit:disabled { background: #3a3a5a; color: #6a6a8a; cursor: not-allowed; }
+  .submit-status { margin-top: 12px; font-size: 13px; }
+  .submit-status.success { color: #2dd4bf; }
+  .submit-status.error { color: #f87171; }
+  .submit-status.pending { color: #fbbf24; }
+
+  .nav { display: flex; justify-content: space-between; max-width: 640px; margin: 24px auto 0; }
+  .btn-back { padding: 10px 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #8a8aaa; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .btn-next { padding: 10px 28px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; font-family: inherit; transition: all 0.2s ease; }
+  .btn-next.enabled { background: #e8d5b7; color: #1a1a2e; cursor: pointer; }
+  .btn-next.disabled { background: rgba(255,255,255,0.05); color: #4a4a6a; cursor: not-allowed; }
+
+  .hidden { display: none; }
+
+  @media (max-width: 520px) {
+    body { padding: 24px 12px 48px; }
+    .phase { padding: 24px 18px; }
+    .input-row, .stats-grid, .summary-grid, .wb-grid, .wb-summary-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 28px; }
+    .rating-btns { flex-wrap: wrap; }
+    .wb-btns { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="tag">AVID II</div>
+    <h1>Quarter Reflection</h1>
+    <p class="sub">An honest look at your systems, not just your grades.</p>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <!-- INTRO -->
+  <div class="phase" id="phase-intro">
+    <h2>Before we start</h2>
+    <p class="phase-sub">This isn't a "look at your grades and feel bad" activity. This is a systems check — like a mechanic running diagnostics. Even a car that's running fine has things to tune up.</p>
+    <div class="callout">
+      <p><strong>The deal:</strong> Be brutally honest. No one is grading this for correctness. If you lie to this tool, you're only cheating yourself out of useful information. The students who get the most out of this are the ones who stop performing "good student" and start being real.</p>
+    </div>
+    <div class="input-row">
+      <div><label class="field-label">Your Name</label><input class="text-input" id="inp-name" placeholder="First & Last"></div>
+      <div><label class="field-label">Period</label><input class="text-input" id="inp-period" placeholder="e.g. 3"></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="phase hidden" id="phase-inventory">
+    <h2>Honest Inventory</h2>
+    <p class="phase-sub">Rate yourself on each AVID behavior. Not where you want to be. Not where you think your teacher sees you. Where you actually are, right now.</p>
+    <div id="rating-rows"></div>
+  </div>
+
+  <!-- SYSTEMS -->
+  <div class="phase hidden" id="phase-systems">
+    <h2>Systems Audit</h2>
+    <p class="phase-sub">On a typical school day (not your best day, not your worst), how do you actually spend your time after school? Be honest — the tool does math.</p>
+    <div id="time-rows"></div>
+    <div class="time-total" id="time-total">
+      <span class="t-label">Total after-school hours accounted for: </span>
+      <span class="t-num" id="time-total-num">0h</span>
+      <div class="t-warn hidden" id="time-warn"></div>
+    </div>
+  </div>
+
+  <!-- GAP -->
+  <div class="phase hidden" id="phase-gap">
+    <h2>The Gap</h2>
+    <p class="phase-sub">Here's what your data says when we put your Honest Inventory and Systems Audit side by side.</p>
+    <div id="gap-content"></div>
+
+    <div class="divider"></div>
+    <h2 style="font-size:24px; margin-bottom:4px;">Whole Life Check</h2>
+    <p class="phase-sub">Grades don't tell the whole story. How are you doing in the areas that don't show up on a transcript?</p>
+    <div class="wb-grid" id="wb-grid"></div>
+
+    <div class="divider"></div>
+    <h2 style="font-size:24px; margin-bottom:4px;">Sit With It</h2>
+    <p class="phase-sub">Don't rush through this part. These prompts are based on YOUR data — not generic questions.</p>
+    <div id="reflect-prompts"></div>
+  </div>
+
+  <!-- FUTURE -->
+  <div class="phase hidden" id="phase-future">
+    <h2>Letter from Future You</h2>
+    <p class="phase-sub">It's the last day of the semester. Write a message FROM that version of you, looking back at this moment. Did you make a change, or did you stay the same?</p>
+    <textarea class="text-input" id="inp-letter" placeholder="Dear present me,&#10;&#10;Looking back at when you did this reflection..."></textarea>
+    <div class="char-count short" id="char-count">50 more characters needed</div>
+    <div class="one-change callout">
+      <label>If you could only change ONE thing between now and the end of the semester, what would it be?</label>
+      <input class="text-input" id="inp-change" placeholder="Be specific — not 'try harder'" style="margin-top:4px">
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="phase hidden" id="phase-summary">
+    <h2>Your Reflection Summary</h2>
+    <div class="summary-meta" id="summary-meta"></div>
+    <div id="summary-content"></div>
+  </div>
+
+  <div class="nav" id="nav">
+    <button class="btn-back hidden" id="btn-back" onclick="goPrev()">← Back</button>
+    <div></div>
+    <button class="btn-next disabled" id="btn-next" onclick="goNext()">Continue →</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  TEACHER SETUP — Google Form Integration
+// ════════════════════════════════════════════════════════════
+//  Step 1: Create a Google Form with 14 "Short Answer" questions
+//          (the question text doesn't matter much — see labels below)
+//
+//  Step 2: Get the form ID from the URL:
+//          docs.google.com/forms/d/  ← THIS PART →  /viewform
+//
+//  Step 3: Get entry IDs by clicking the 3-dot menu → "Get pre-filled link"
+//          Fill in dummy answers for each field, click "Get link"
+//          The URL will contain entry.XXXXXXXXXX for each field
+//
+//  Step 4: Replace the values below with your form ID and entry IDs
+// ════════════════════════════════════════════════════════════
+const GOOGLE_FORM_ID = 'YOUR_FORM_ID_HERE';
+
+const ENTRY_IDS = {
+  name:           'entry.XXXXXXXXXX',  // Q1:  Student Name
+  period:         'entry.XXXXXXXXXX',  // Q2:  Period
+  inventoryData:  'entry.XXXXXXXXXX',  // Q3:  AVID Inventory Ratings
+  timeData:       'entry.XXXXXXXXXX',  // Q4:  Time Audit Data
+  wbSocial:       'entry.XXXXXXXXXX',  // Q5:  Well-being: Social
+  wbHealth:       'entry.XXXXXXXXXX',  // Q6:  Well-being: Sleep/Health
+  wbStress:       'entry.XXXXXXXXXX',  // Q7:  Well-being: Stress
+  wbJoy:          'entry.XXXXXXXXXX',  // Q8:  Well-being: Joy
+  reflect1:       'entry.XXXXXXXXXX',  // Q9:  Reflection Response 1
+  reflect2:       'entry.XXXXXXXXXX',  // Q10: Reflection Response 2
+  reflect3:       'entry.XXXXXXXXXX',  // Q11: Reflection Response 3
+  futureLetter:   'entry.XXXXXXXXXX',  // Q12: Future Self Letter
+  oneChange:      'entry.XXXXXXXXXX',  // Q13: One Change Commitment
+  academicInsight:'entry.XXXXXXXXXX',  // Q14: Academic Gap Insight (auto)
+};
+// ════════════════════════════════════════════════════════════
+
+const PHASES = ["intro","inventory","systems","gap","future","summary"];
+const PHASE_META = [
+  { label:"Start", icon:"◉" }, { label:"Inventory", icon:"◎" },
+  { label:"Time Audit", icon:"⚙" }, { label:"The Gap", icon:"△" },
+  { label:"Future Self", icon:"→" }, { label:"Summary", icon:"✦" },
+];
+
+const BEHAVIORS = [
+  { id:"binder", label:"Binder / Organization", desc:"Is your binder current, organized, and usable?" },
+  { id:"tutorials", label:"Tutorial Prep", desc:"Do you come to tutorials with a completed TRF and genuine question?" },
+  { id:"notes", label:"Note Quality", desc:"Are your Cornell Notes thorough, with real questions and summaries?" },
+  { id:"agenda", label:"Planner / Agenda Use", desc:"Do you consistently use your planner to track assignments and deadlines?" },
+  { id:"engagement", label:"Class Engagement", desc:"Do you actively participate, or just exist in the room?" },
+  { id:"grades", label:"Grade Monitoring", desc:"Do you regularly check grades and address missing work before it piles up?" },
+];
+const RATING_LABELS = ["","Not at all","Rarely","Sometimes","Usually","Consistently"];
+
+const TIME_OPTIONS = [
+  { id:"studying", label:"Studying / Homework", color:"#2dd4bf" },
+  { id:"phone", label:"Phone / Social Media", color:"#f472b6" },
+  { id:"sports", label:"Sports / Activities", color:"#60a5fa" },
+  { id:"work", label:"Job / Work", color:"#fbbf24" },
+  { id:"sleep", label:"Sleep", color:"#a78bfa" },
+  { id:"social", label:"Hanging Out / Social", color:"#fb923c" },
+  { id:"gaming", label:"Gaming / TV / YouTube", color:"#f87171" },
+  { id:"other", label:"Other", color:"#94a3b8" },
+];
+
+const WELLBEING = [
+  { id:"social", icon:"👥", name:"Social & Relationships", q:"Do you feel connected to friends and people who matter to you? Do you have people you can talk to?",
+    labels:["Isolated","Disconnected","It's okay","Pretty good","Thriving"], color:"#fb923c" },
+  { id:"health", icon:"💤", name:"Sleep & Physical Health", q:"Are you sleeping enough? Eating okay? Do you have energy, or are you running on empty?",
+    labels:["Running on fumes","Not great","Surviving","Good","Fully rested"], color:"#a78bfa" },
+  { id:"stress", icon:"🧠", name:"Stress & Mental Load", q:"How heavy does everything feel right now? School, home, responsibilities — all of it.",
+    labels:["Drowning","Overwhelmed","Managing","Comfortable","Light"], color:"#60a5fa" },
+  { id:"joy", icon:"✨", name:"Joy & Fun", q:"Outside of obligations, are you doing things that actually make you happy? Not scrolling — real enjoyment.",
+    labels:["Nothing","Very little","Sometimes","Often","Regularly"], color:"#2dd4bf" },
+];
+
+let current = 0;
+let ratings = new Array(BEHAVIORS.length).fill(0);
+let timeData = {}; TIME_OPTIONS.forEach(o => timeData[o.id] = 0);
+let wbRatings = {}; WELLBEING.forEach(w => wbRatings[w.id] = 0);
+let reflectAnswers = ['', '', ''];
+let reflectQuestions = ['', '', ''];
+let academicInsight = '';
+
+// === Build UI ===
+const ratingContainer = document.getElementById('rating-rows');
+BEHAVIORS.forEach((b, i) => {
+  const row = document.createElement('div'); row.className = 'rating-row';
+  row.innerHTML = `<div class="r-label">${b.label}</div><div class="r-desc">${b.desc}</div>
+    <div class="rating-btns" id="rb-${i}">${[1,2,3,4,5].map(n => `<button data-val="${n}" onclick="setRating(${i},${n})">${RATING_LABELS[n]}</button>`).join('')}</div>`;
+  ratingContainer.appendChild(row);
+});
+
+const timeContainer = document.getElementById('time-rows');
+TIME_OPTIONS.forEach(o => {
+  const row = document.createElement('div'); row.className = 'time-row';
+  row.innerHTML = `<div class="time-header"><div class="time-label"><div class="time-dot" style="background:${o.color}"></div>${o.label}</div>
+    <span class="time-val" id="tv-${o.id}" style="color:${o.color}">—</span></div>
+    <input type="range" min="0" max="8" step="0.5" value="0" style="--accent:${o.color}" id="tr-${o.id}" oninput="setTime('${o.id}', this.value)">`;
+  timeContainer.appendChild(row);
+});
+
+const wbContainer = document.getElementById('wb-grid');
+WELLBEING.forEach(w => {
+  const card = document.createElement('div'); card.className = 'wb-card';
+  card.innerHTML = `<div class="wb-icon">${w.icon}</div><div class="wb-name">${w.name}</div><div class="wb-q">${w.q}</div>
+    <div class="wb-btns" id="wb-${w.id}">${[1,2,3,4,5].map(n => `<button data-val="${n}" onclick="setWB('${w.id}',${n})">${w.labels[n-1]}</button>`).join('')}</div>`;
+  wbContainer.appendChild(card);
+});
+
+// === Handlers ===
+function setRating(idx, val) {
+  ratings[idx] = val;
+  document.querySelectorAll(`#rb-${idx} button`).forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === val));
+  checkCanProceed();
+}
+
+function setTime(id, val) {
+  val = parseFloat(val); timeData[id] = val;
+  document.getElementById('tv-' + id).textContent = val === 0 ? '—' : val < 1 ? Math.round(val*60)+'m' : val+'h';
+  updateTimeTotal(); checkCanProceed();
+}
+
+function setWB(id, val) {
+  wbRatings[id] = val;
+  const w = WELLBEING.find(x => x.id === id);
+  document.querySelectorAll(`#wb-${id} button`).forEach(b => {
+    const v = parseInt(b.dataset.val); const sel = v === val;
+    b.classList.toggle('selected', sel);
+    b.style.background = sel ? w.color : '';
+  });
+  if (WELLBEING.every(w => wbRatings[w.id] > 0)) {
+    const saved = [...reflectAnswers];
+    buildReflectPrompts();
+    reflectAnswers = saved;
+    document.querySelectorAll('[id^="reflect-"]').forEach((el, i) => { if (saved[i]) el.value = saved[i]; });
+  }
+  checkCanProceed();
+}
+
+function updateTimeTotal() {
+  const total = Object.values(timeData).reduce((a,b) => a+b, 0);
+  const numEl = document.getElementById('time-total-num');
+  const totalEl = document.getElementById('time-total');
+  const warnEl = document.getElementById('time-warn');
+  numEl.textContent = total + 'h';
+  if (total > 0 && (total < 5 || total > 14)) {
+    totalEl.classList.add('warn'); warnEl.classList.remove('hidden');
+    warnEl.textContent = total < 5 ? "That seems low — are you accounting for everything?" : "That's more than the hours available. Double-check your estimates.";
+  } else { totalEl.classList.remove('warn'); warnEl.classList.add('hidden'); }
+}
+
+function canProceed() {
+  const p = PHASES[current];
+  if (p === 'intro') return document.getElementById('inp-name').value.trim().length > 0 && document.getElementById('inp-period').value.trim().length > 0;
+  if (p === 'inventory') return ratings.every(r => r > 0);
+  if (p === 'systems') return Object.values(timeData).some(v => v > 0);
+  if (p === 'gap') return WELLBEING.every(w => wbRatings[w.id] > 0) && reflectAnswers.every(a => a.trim().length >= 30);
+  if (p === 'future') return document.getElementById('inp-letter').value.trim().length >= 50 && document.getElementById('inp-change').value.trim().length > 0;
+  return false;
+}
+
+function checkCanProceed() {
+  const btn = document.getElementById('btn-next');
+  if (canProceed()) { btn.classList.remove('disabled'); btn.classList.add('enabled'); }
+  else { btn.classList.add('disabled'); btn.classList.remove('enabled'); }
+}
+
+function renderProgress() {
+  const c = document.getElementById('progress'); c.innerHTML = '';
+  PHASE_META.forEach((p, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i < current ? ' done' : '') + (i === current ? ' active' : '');
+    dot.textContent = p.icon; c.appendChild(dot);
+    if (i < PHASE_META.length - 1) { const line = document.createElement('div'); line.className = 'line' + (i < current ? ' done' : ''); c.appendChild(line); }
+  });
+}
+
+function showPhase() {
+  PHASES.forEach((p, i) => document.getElementById('phase-' + p).classList.toggle('hidden', i !== current));
+  document.getElementById('btn-back').classList.toggle('hidden', current === 0);
+  document.getElementById('nav').classList.toggle('hidden', PHASES[current] === 'summary');
+  document.getElementById('btn-next').textContent = PHASES[current] === 'future' ? 'View Summary →' : 'Continue →';
+  renderProgress(); checkCanProceed();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (PHASES[current] === 'gap') buildGap();
+  if (PHASES[current] === 'summary') buildSummary();
+}
+
+function goNext() { if (!canProceed()) return; if (current < PHASES.length - 1) { current++; showPhase(); } }
+function goPrev() { if (current > 0) { current--; showPhase(); } }
+
+document.getElementById('inp-name').addEventListener('input', checkCanProceed);
+document.getElementById('inp-period').addEventListener('input', checkCanProceed);
+document.getElementById('inp-letter').addEventListener('input', function() {
+  const len = this.value.trim().length; const el = document.getElementById('char-count');
+  if (len < 50) { el.className = 'char-count short'; el.textContent = (50-len) + ' more characters needed'; }
+  else { el.className = 'char-count ok'; el.textContent = '✓ Good length'; }
+  checkCanProceed();
+});
+document.getElementById('inp-change').addEventListener('input', checkCanProceed);
+
+function updateReflect(idx, val) {
+  reflectAnswers[idx] = val;
+  const el = document.getElementById('rc-' + idx); const len = val.trim().length;
+  if (len >= 30) { el.className = 'char-count ok'; el.textContent = '✓ Good'; }
+  else { el.className = 'char-count short'; el.textContent = (30-len) + ' more characters'; }
+  checkCanProceed();
+}
+
+// === Adaptive Reflection Prompts ===
+function generateReflectPrompts() {
+  const avg = ratings.reduce((a,b) => a+b, 0) / ratings.length;
+  const study = timeData.studying || 0;
+  const screen = (timeData.phone || 0) + (timeData.gaming || 0);
+  const sleep = timeData.sleep || 0;
+  const wbS = wbRatings.social || 3;
+  const wbH = wbRatings.health || 3;
+  const wbSt = wbRatings.stress || 3;
+  const wbJ = wbRatings.joy || 3;
+  const wbAvg = (wbS + wbH + wbSt + wbJ) / 4;
+  const prompts = [];
+
+  // Prompt 1: Academic + Well-being crossover
+  if (avg >= 4 && wbAvg < 3) {
+    prompts.push("Your AVID systems look strong — but your well-being ratings tell a different story. Is your academic success coming at a cost? What are you sacrificing to keep your grades up, and is that trade-off sustainable for another full semester?");
+  } else if (avg >= 4 && wbAvg >= 3) {
+    prompts.push("You're in a strong position academically and your well-being seems solid. That's great — but it also means the biggest risk is autopilot. What's one area where you've stopped pushing yourself because \"good enough\" feels comfortable?");
+  } else if (avg < 3 && wbAvg < 3) {
+    prompts.push("Both your academic systems and your well-being are struggling right now. That's not a character flaw — it's a sign that something foundational needs to shift. Which came first: the academic struggles or the personal ones? Understanding that might tell you where to start.");
+  } else {
+    prompts.push("Your academics and your well-being are telling different stories. Look at the specific areas where you rated lowest in each — is there a connection? Sometimes fixing a personal struggle (like sleep or stress) has a bigger impact on grades than any study strategy.");
+  }
+
+  // Prompt 2: Time vs. well-being
+  if (screen > 3 && wbJ <= 2) {
+    prompts.push("You're spending " + screen + " hours a day on screens, but you rated your joy level as \"" + WELLBEING.find(w=>w.id==='joy').labels[wbJ-1].toLowerCase() + ".\" Scrolling fills time, but it doesn't fill the tank. What did you used to do for fun that you've stopped doing — and what would it take to bring one of those things back?");
+  } else if (timeData.social < 1 && wbS <= 2) {
+    prompts.push("Your time audit barely includes social time, and you rated your social connections as \"" + WELLBEING.find(w=>w.id==='social').labels[wbS-1].toLowerCase() + ".\" Relationships aren't a luxury — they're part of how humans function. What's one realistic way you could build in more connection this week, even a small one?");
+  } else if (sleep < 6 && wbH <= 2) {
+    prompts.push("You're logging " + sleep + " hours of sleep and you rated your physical health as \"" + WELLBEING.find(w=>w.id==='health').labels[wbH-1].toLowerCase() + ".\" Everything — focus, mood, motivation, grades — runs on sleep. What's actually keeping you up at night, and is it worth the cost?");
+  } else if (study >= 3 && wbSt <= 2) {
+    prompts.push("You're putting in " + study + " hours of study time, but your stress level is high. More hours doesn't always mean better results — sometimes it means you're grinding inefficiently or carrying anxiety about performance. What would happen if you studied smarter instead of longer?");
+  } else {
+    prompts.push("Look at how you spend your time after school and compare it to your well-being ratings. Where's the biggest mismatch? Is there a category eating up hours that isn't actually making your life better — or a category getting zero hours that your well-being is clearly suffering without?");
+  }
+
+  // Prompt 3: The uncomfortable one
+  if (avg >= 4 && wbAvg >= 4) {
+    prompts.push("Here's the hardest question for someone in your position: If everything looks good on paper, what's the thing you're NOT dealing with? What conversation are you avoiding, what goal have you shelved, or what part of your life are you ignoring because the rest is working well enough?");
+  } else if (wbSt <= 2 && wbJ <= 2) {
+    prompts.push("You're stressed and not experiencing much joy. That combination makes everything harder — including school. Before we talk about grades: what is one thing you could do this week purely for yourself, with no productive purpose, that might help you feel more like a human and less like a machine?");
+  } else if (avg < 3 && wbAvg >= 4) {
+    prompts.push("Your well-being seems solid, but your academic systems aren't matching up. That's actually a great position to be in — you have the energy and mental space to fix things. So what's the real blocker? Is it motivation, skill, environment, or something else? Be specific.");
+  } else {
+    prompts.push("If a friend showed you their exact ratings — both the AVID behaviors and the well-being scores — what advice would you give them? Sometimes we can see the truth about someone else's situation more clearly than our own. Write what you'd honestly tell that friend.");
+  }
+
+  return prompts;
+}
+
+function buildReflectPrompts() {
+  const prompts = generateReflectPrompts();
+  reflectQuestions = prompts;
+  const container = document.getElementById('reflect-prompts'); container.innerHTML = '';
+  prompts.forEach((q, i) => {
+    const div = document.createElement('div'); div.className = 'reflect-prompt';
+    div.innerHTML = `<div class="rp-q">${q}</div>
+      <textarea class="text-input short" placeholder="Write honestly — minimum 30 characters" id="reflect-${i}" oninput="updateReflect(${i}, this.value)">${reflectAnswers[i]||''}</textarea>
+      <div class="char-count ${(reflectAnswers[i]||'').trim().length >= 30 ? 'ok' : 'short'}" id="rc-${i}">${(reflectAnswers[i]||'').trim().length >= 30 ? '✓ Good' : (30 - (reflectAnswers[i]||'').trim().length) + ' more characters'}</div>`;
+    container.appendChild(div);
+  });
+}
+
+// === Gap Analysis ===
+function buildGap() {
+  const avg = ratings.reduce((a,b) => a+b, 0) / ratings.length;
+  const total = Object.values(timeData).reduce((a,b) => a+b, 0);
+  const study = timeData.studying || 0;
+  const screen = (timeData.phone || 0) + (timeData.gaming || 0);
+  const studyPct = total > 0 ? Math.round((study/total)*100) : 0;
+  const screenPct = total > 0 ? Math.round((screen/total)*100) : 0;
+
+  let insight;
+  if (avg >= 4 && study >= 2) insight = "Your systems are solid and your time backs it up. The question isn't whether you're doing enough — it's whether you're doing the right things.";
+  else if (avg >= 4 && study < 1.5) insight = "You rated your AVID behaviors highly, but your time audit doesn't show much study time. Either you're incredibly efficient — or there's a gap between self-perception and reality.";
+  else if (avg < 3 && screen > study) insight = "The behaviors you rated lowest require consistent daily effort — and your screen time outpaces study time. This isn't about working harder. It's about where hours actually go.";
+  else if (avg < 3) insight = "Your self-ratings are honest: the systems aren't where they need to be. The question is which ONE behavior would have the biggest ripple effect on everything else.";
+  else insight = "Some things are working, others aren't. That's harder than struggling everywhere — because it's easy to feel \"fine\" while leaving performance on the table.";
+
+  academicInsight = insight;
+  const low = BEHAVIORS.filter((_,i) => ratings[i] <= 2);
+  const high = BEHAVIORS.filter((_,i) => ratings[i] >= 4);
+  const acol = (v, h, m) => v >= h ? '#2dd4bf' : v >= m ? '#fbbf24' : '#f87171';
+
+  let html = `<div class="stats-grid">
+    <div class="stat-card" style="border:1px solid ${acol(avg,4,3)}33"><div class="stat-val" style="color:${acol(avg,4,3)}">${avg.toFixed(1)} / 5</div><div class="stat-label">Avg Self-Rating</div></div>
+    <div class="stat-card" style="border:1px solid ${acol(study,2,1)}33"><div class="stat-val" style="color:${acol(study,2,1)}">${studyPct}%</div><div class="stat-label">Study Time</div></div>
+    <div class="stat-card" style="border:1px solid ${screen<=2?'#2dd4bf':'#f87171'}33"><div class="stat-val" style="color:${screen<=2?'#2dd4bf':'#f87171'}">${screenPct}%</div><div class="stat-label">Screen Time</div></div>
+  </div>
+  <div class="insight-box"><div class="i-label">Academic Snapshot</div><p>${insight}</p></div>`;
+  if (low.length) html += `<div class="tag-section"><div class="tag-heading red">⚠ Needs Work</div><div class="tags">${low.map(b=>`<span class="tag red">${b.label}</span>`).join('')}</div></div>`;
+  if (high.length) html += `<div class="tag-section"><div class="tag-heading green">✓ Strengths</div><div class="tags">${high.map(b=>`<span class="tag green">${b.label}</span>`).join('')}</div></div>`;
+
+  document.getElementById('gap-content').innerHTML = html;
+  buildReflectPrompts();
+}
+
+// === Summary ===
+function buildSummary() {
+  const name = document.getElementById('inp-name').value.trim();
+  const period = document.getElementById('inp-period').value.trim();
+  const letter = document.getElementById('inp-letter').value.trim();
+  const change = document.getElementById('inp-change').value.trim();
+  document.getElementById('summary-meta').textContent = name + ' · Period ' + period;
+  const vc = v => v >= 4 ? 'high' : v >= 3 ? 'mid' : 'low';
+  const esc = s => s.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  let html = `<div class="section-label">Honest Inventory</div><div class="summary-grid">`;
+  BEHAVIORS.forEach((b,i) => { html += `<div class="summary-item"><span class="s-label">${b.label}</span><span class="s-val ${vc(ratings[i])}">${ratings[i]}/5</span></div>`; });
+  html += `</div>`;
+
+  html += `<div class="section-label">Time Audit</div><div class="time-tags">`;
+  TIME_OPTIONS.filter(o => timeData[o.id] > 0).forEach(o => { html += `<span class="time-tag" style="background:${o.color}18;color:${o.color};border:1px solid ${o.color}33">${o.label}: ${timeData[o.id]}h</span>`; });
+  html += `</div>`;
+
+  html += `<div class="section-label">Whole Life Check</div><div class="wb-summary-grid">`;
+  WELLBEING.forEach(w => { const v = wbRatings[w.id]; html += `<div class="summary-item"><span class="s-label">${w.icon} ${w.name}</span><span class="s-val ${vc(v)}">${w.labels[v-1]}</span></div>`; });
+  html += `</div>`;
+
+  html += `<div class="section-label">Reflection Responses</div><div class="reflect-summary">`;
+  reflectQuestions.forEach((q, i) => { html += `<div class="rs-item"><div class="rs-q">${q}</div><div class="rs-a">${esc(reflectAnswers[i])}</div></div>`; });
+  html += `</div>`;
+
+  html += `<div class="change-box"><div class="section-label">My One Change</div><p>"${esc(change)}"</p></div>`;
+  html += `<div class="section-label">Letter from Future Self</div><div class="letter-text">${esc(letter)}</div>`;
+
+  html += `<div class="submit-box">
+    <div class="s-main">Ready to submit your reflection?</div>
+    <button class="btn-submit" id="btn-submit" onclick="submitToForm()">Submit Reflection</button>
+    <div class="submit-status hidden" id="submit-status"></div>
+  </div>`;
+
+  document.getElementById('summary-content').innerHTML = html;
+}
+
+// === Google Form Submission ===
+function submitToForm() {
+  const btn = document.getElementById('btn-submit');
+  const status = document.getElementById('submit-status');
+  btn.disabled = true;
+  status.className = 'submit-status pending'; status.classList.remove('hidden');
+  status.textContent = 'Submitting...';
+
+  if (GOOGLE_FORM_ID === 'YOUR_FORM_ID_HERE') {
+    status.className = 'submit-status error'; status.classList.remove('hidden');
+    status.textContent = 'Google Form not configured yet — take a screenshot of this page and submit it to your teacher.';
+    btn.disabled = false;
+    return;
+  }
+
+  const invStr = BEHAVIORS.map((b,i) => b.label + ': ' + ratings[i] + '/5').join(' | ');
+  const timeStr = TIME_OPTIONS.filter(o => timeData[o.id] > 0).map(o => o.label + ': ' + timeData[o.id] + 'h').join(' | ');
+
+  const formData = new URLSearchParams();
+  formData.append(ENTRY_IDS.name, document.getElementById('inp-name').value.trim());
+  formData.append(ENTRY_IDS.period, document.getElementById('inp-period').value.trim());
+  formData.append(ENTRY_IDS.inventoryData, invStr);
+  formData.append(ENTRY_IDS.timeData, timeStr);
+  formData.append(ENTRY_IDS.wbSocial, wbRatings.social + '/5 - ' + WELLBEING[0].labels[wbRatings.social-1]);
+  formData.append(ENTRY_IDS.wbHealth, wbRatings.health + '/5 - ' + WELLBEING[1].labels[wbRatings.health-1]);
+  formData.append(ENTRY_IDS.wbStress, wbRatings.stress + '/5 - ' + WELLBEING[2].labels[wbRatings.stress-1]);
+  formData.append(ENTRY_IDS.wbJoy, wbRatings.joy + '/5 - ' + WELLBEING[3].labels[wbRatings.joy-1]);
+  formData.append(ENTRY_IDS.reflect1, reflectAnswers[0]);
+  formData.append(ENTRY_IDS.reflect2, reflectAnswers[1]);
+  formData.append(ENTRY_IDS.reflect3, reflectAnswers[2]);
+  formData.append(ENTRY_IDS.futureLetter, document.getElementById('inp-letter').value.trim());
+  formData.append(ENTRY_IDS.oneChange, document.getElementById('inp-change').value.trim());
+  formData.append(ENTRY_IDS.academicInsight, academicInsight);
+
+  fetch(`https://docs.google.com/forms/d/${GOOGLE_FORM_ID}/formResponse`, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: formData.toString()
+  }).then(() => {
+    status.className = 'submit-status success'; status.classList.remove('hidden');
+    status.textContent = '✓ Submitted successfully! Your teacher will receive your responses.';
+    btn.textContent = 'Submitted ✓';
+  }).catch(() => {
+    status.className = 'submit-status error'; status.classList.remove('hidden');
+    status.textContent = 'Submission may have failed — take a screenshot just in case.';
+    btn.disabled = false;
+  });
+}
+
+// Init
+showPhase();
+</script>
+</body>
+</html>
