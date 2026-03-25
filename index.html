@@ -806,7 +806,7 @@ function submitToForm() {
     body: formData.toString()
   }).then(() => {
     status.className = 'submit-status success'; status.classList.remove('hidden');
-    status.textContent = '✓ Submitted successfully! Your teacher will receive your responses.';
+    status.textContent = '✓ Submitted successfully! Villa will receive your responses.';
     btn.textContent = 'Submitted ✓';
   }).catch(() => {
     status.className = 'submit-status error'; status.classList.remove('hidden');
